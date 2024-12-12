@@ -19,13 +19,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
 
 # Add directories where your static files are stored
-STATICFILES_DIRS = [
-     BASE_DIR / 'staticfiles', 
+STATICFILES_DIRS = [ 
     BASE_DIR / 'assets',  # Additional static assets folder
 ]
 
 # Directory where `collectstatic` will gather all static files for production
-STATIC_ROOT = BASE_DIR / 'static_root'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
