@@ -101,18 +101,27 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
     },
-
-    'appDb': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'todo_appp',
-        'USER': 'root',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',  # ou l'adresse IP du serveur
-        'PORT': '3306',  # Port par défaut pour MySQL
-    }
 }
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
