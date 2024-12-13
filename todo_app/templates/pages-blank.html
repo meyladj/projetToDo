@@ -32,7 +32,7 @@
 
 <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
-  <link href="{% static 'css/stylenote.css' %}" rel="stylesheet">
+  <link href="{% static 'css/stylenote.css'%}" rel="stylesheet">
 
 
 </head>
@@ -44,7 +44,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="{% url 'dashboard' %}" class="logo d-flex align-items-center">
-        <img src="/img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png" alt="">
+        <img src="{% static 'img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png' %}" alt="">
         <span class="d-none d-lg-block">Focus to do</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -247,34 +247,39 @@
       </nav>
     </div><!-- End Page Title -->
 
-    <div class="card-container">
-      {% for note in notes %}
-      <div class="card">
-          <div class="card-header">{{ note.title }}</div>
-          <div class="card-body">
-              <p>{{ note.content }}</p>
-          </div>
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-6">
+        <div style="width: 100%; padding: 0; margin: 0;">
+  <div class="card-container">
+    <!-- Cartes -->
+    <div class="card">
+      <div class="card-header">Note 1</div>
+      <div class="card-body">
+        <p>Start creating your notes!</p>
       </div>
-      {% empty %}
-      <p>No notes found. Start adding your notes!</p>
-      {% endfor %}
+      <button class="add-note-btn">+</button>
+    </div>
+    <!-- Plus de cartes ici -->
   </div>
-  
-  <!-- Form to Add New Note -->
-  <form method="POST" class="add-note-form">
-      {% csrf_token %}
-      <div class="form-group">
-          <input type="text" name="title" placeholder="Note Title" required class="form-control">
+</div>
+        </div>
+        
+
+        </div>
+        </div>
       </div>
-      <div class="form-group">
-          <textarea name="content" placeholder="Note Content" required class="form-control"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Add Note</button>
-  </form>
+    </section>
 
   </main><!-- End #main -->
 
- 
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+    </div>
+    
+  </footer><!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
