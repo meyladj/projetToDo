@@ -10,6 +10,8 @@ from django.dispatch import receiver
 from django.db import IntegrityError
 
 
+
+
 def one_week_hence():
     return now() + timedelta(weeks=1)
 
@@ -24,14 +26,13 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255, blank=True)
-    address = models.CharField(max_length=255, blank=True)
-    phone = models.CharField(max_length=15, blank=True)
-    country = models.CharField(max_length=100, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    full_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    country = models.CharField(max_length=50)
 
     def __str__(self):
-      return self.user.username
+        return self.full_name
     
 
 #class UserProfile(models.Model):

@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import make_password
 from .models import Task, Profile
 from .forms import TaskForm
 import logging
+from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -124,8 +125,6 @@ def edit_profile(request):
 
 # Inscription
 def register_view(request):
-    logger.info(f"Register attempt by: {request.POST.get('username')}")
-
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -134,33 +133,44 @@ def register_view(request):
         phone = request.POST.get('phone')
         country = request.POST.get('country')
 
-        if not username or not email or not password or not full_name or not phone or not country:
+        print(f"Register data: username={username}, email={email}, full_name={full_name}")
+
+        # Vérification des champs obligatoires
+        if not all([username, email, password, full_name, phone, country]):
             messages.error(request, "All fields are required!")
-            print("Fields missing: ", username, email, password, full_name, phone, country)  # Debug
+            print("Fields missing")
             return redirect('register')
 
+        # Vérification des doublons
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists!')
+            print("Username exists")
             return redirect('register')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered!')
+            print("Email exists")
             return redirect('register')
 
         try:
+            # Création de l'utilisateur
             user = User.objects.create_user(username=username, email=email, password=password)
+            # Création du profil utilisateur
             Profile.objects.create(user=user, full_name=full_name, phone=phone, country=country)
-
+            
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('dashboard')
+
+        except IntegrityError as e:
+            messages.error(request, f"Database error: {e}")
+            print(f"Database error: {e}")
         except Exception as e:
-            print(f"Error: {e}")  # Debug
-            messages.error(request, f'An error occurred: {e}')
-            return redirect('register')
+            messages.error(request, f"An unexpected error occurred: {e}")
+            print(f"Unexpected error: {e}")
+
 
     return render(request, 'pages-register.html')
-
 
 # Connexion
 def login_view(request):
