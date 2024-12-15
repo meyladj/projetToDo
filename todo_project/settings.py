@@ -79,6 +79,8 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'todo_app.CustomUser'
+
 WSGI_APPLICATION = 'todo_project.wsgi.application'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -97,7 +99,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',  # Django's default database
         'NAME': 'todo_app',
         'USER': 'root',
-        'PASSWORD': '1234',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     },
@@ -122,6 +124,10 @@ LOGGING = {
         },
     },
 }
+OPTIONS = {
+    'sql_mode': 'STRICT_TRANS_TABLES',
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

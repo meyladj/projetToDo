@@ -21,6 +21,8 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),  # Inscription (pages-register.html)
     path('notes/', views.blank_page, name='notes'),  # Page notes (pages-blank.html)
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('test-create-user/', views.test_create_user, name='test_create_user'),
+
 
 ]
 

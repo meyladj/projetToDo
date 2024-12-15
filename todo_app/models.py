@@ -1,13 +1,8 @@
 from django.db import models
-from django.utils import timezone
-from django.urls import reverse
-from datetime import timedelta
 from django.utils.timezone import now
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.db import IntegrityError
+from datetime import timedelta
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings  # Pour AUTH_USER_MODEL
 
 
 
@@ -15,25 +10,7 @@ from django.db import IntegrityError
 def one_week_hence():
     return now() + timedelta(weeks=1)
 
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
 
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    full_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
-    country = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.full_name
-    
 
 #class UserProfile(models.Model):
    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -41,14 +18,22 @@ class Profile(models.Model):
    # country = models.CharField(max_length=100, blank=True, null=True)
    # address = models.TextField(blank=True, null=True)
    # phone = models.CharField(max_length=15, blank=True, null=True)
-
 class TaskList(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)  # Name of the task list
-    description = models.TextField(blank=True, null=True)  # Optional description
-
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+ 
     def __str__(self):
         return self.name
+
+
+class CustomUser(AbstractUser):
+    full_name = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return self.username
 
 
 class Task(models.Model):
@@ -63,7 +48,12 @@ class Task(models.Model):
         ('Processing', 'Processing'),
         ('Cancelled', 'Cancelled'),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)  # Add this line
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tasks',  # Facilite l'accès via user.tasks
+        default=1  # À supprimer si le champ doit être obligatoire
+    )
     name = models.CharField(max_length=255)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category = models.CharField(max_length=100)
