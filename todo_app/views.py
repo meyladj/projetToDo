@@ -6,14 +6,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Task
+from .models import Task, Category
 from .forms import TaskForm
 from .models import CustomUser
 from django.db import IntegrityError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-
+from datetime import datetime, timedelta
+from django.utils.timezone import now
+from django.db.models import Count, Q
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 
 User = get_user_model()
 
@@ -24,7 +27,57 @@ def base_view(request):
 # Tableau de bord
 @login_required
 def dashboard(request):
-    return render(request, 'index.html')
+    # Récupération du filtre pour le donut chart
+    filter_type = request.GET.get('filter', 'month')
+    today = now().date()
+
+    # Déterminer la plage de dates selon le filtre
+    if filter_type == 'day':
+        start_date = today
+    elif filter_type == 'week':
+        start_date = today - timedelta(days=today.weekday())
+    else:  # Par défaut: mois
+        start_date = today.replace(day=1)
+
+    # Tâches filtrées par date
+    tasks = Task.objects.filter(due_date__date__gte=start_date)
+
+    # Comptage des tâches par catégorie
+    categories = Category.objects.annotate(
+        task_count=Count('task', filter=Q(task__in=tasks))
+    )
+    total_tasks = tasks.count()
+
+    # Données pour le donut chart
+    category_data = [
+        {
+            "name": category.name,
+            "count": category.task_count,
+            "percentage": (category.task_count / total_tasks * 100) if total_tasks > 0 else 0,
+            "color": category.color or "#d3d3d3",  # Gris par défaut
+        }
+        for category in categories
+    ]
+
+    # Gestion des cas sans catégorie
+    if total_tasks == 0 or not category_data:
+        category_data = [{"name": "No Category", "count": 0, "percentage": 0, "color": "#d3d3d3"}]
+
+    # Calcul des tâches par jour, semaine, mois
+    start_of_week = today - timedelta(days=today.weekday())  # Début de la semaine
+    start_of_month = today.replace(day=1)  # Début du mois
+
+    tasks_today = Task.objects.filter(due_date__date=today).count()
+    tasks_this_week = Task.objects.filter(due_date__date__gte=start_of_week).count()
+    tasks_this_month = Task.objects.filter(due_date__date__gte=start_of_month).count()
+
+    return render(request, 'index.html', {
+        'category_data': category_data,
+        'filter_type': filter_type,
+        'tasks_today': tasks_today,
+        'tasks_this_week': tasks_this_week,
+        'tasks_this_month': tasks_this_month,
+    })
 
 # Profil utilisateur
 @login_required

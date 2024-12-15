@@ -11,7 +11,8 @@ def one_week_hence():
     return now() + timedelta(weeks=1)
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=191, unique=True)
+    color = models.CharField(max_length=7, default="#cccccc")  # Hex color code for categories
 
     def __str__(self):
         return self.name
@@ -58,7 +59,7 @@ class Task(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES)
-    due_date = models.DateTimeField(default=one_week_hence)  # Add this if not already defined
+    due_date = models.DateTimeField()  # Add this if not already defined
 
     def __str__(self):
         return self.name

@@ -274,9 +274,7 @@
                       </svg>
                     </div>
                     <div class="ps-3">
-                      <h6>0</h6>
-                      
-
+                      <h6>{{ tasks_today }}</h6>
                     </div>
                   </div>
                 </div>
@@ -305,9 +303,7 @@
                       </svg>
                     </div>
                     <div class="ps-3">
-                      <h6>0</h6>
-                      
-
+                      <h6>{{ tasks_today }}</h6>
                     </div>
                   </div>
                 </div>
@@ -335,8 +331,7 @@
                       </svg>
                     </div>
                     <div class="ps-3">
-                      <h6>0</h6>
-
+                      <h6>{{ tasks_this_month }}</h6>
                     </div>
                   </div>
 
@@ -563,23 +558,17 @@
 
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
+                  const categoryData = JSON.parse('{{ category_data|safe }}');
+                
                   echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: {
-                      trigger: 'item'
-                    },
-                    legend: {
-                      top: '5%',
-                      left: 'center'
-                    },
+                    tooltip: { trigger: 'item' },
+                    legend: { top: '5%', left: 'center' },
                     series: [{
-                      name: 'Access From',
+                      name: 'Tasks by Category',
                       type: 'pie',
                       radius: ['40%', '70%'],
                       avoidLabelOverlap: false,
-                      label: {
-                        show: false,
-                        position: 'center'
-                      },
+                      label: { show: false, position: 'center' },
                       emphasis: {
                         label: {
                           show: true,
@@ -587,34 +576,17 @@
                           fontWeight: 'bold'
                         }
                       },
-                      labelLine: {
-                        show: false
-                      },
-                      data: [{
-                          value: 1048,
-                          name: 'Search Engine'
-                        },
-                        {
-                          value: 735,
-                          name: 'Direct'
-                        },
-                        {
-                          value: 580,
-                          name: 'Email'
-                        },
-                        {
-                          value: 484,
-                          name: 'Union Ads'
-                        },
-                        {
-                          value: 300,
-                          name: 'Video Ads'
-                        }
-                      ]
+                      labelLine: { show: false },
+                      data: categoryData.map(category => ({
+                        value: category.count,
+                        name: category.name,
+                        itemStyle: { color: category.color }
+                      }))
                     }]
                   });
                 });
-              </script>
+                </script>
+                
 
             </div>
           </div><!-- End Website Traffic -->

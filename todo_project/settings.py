@@ -96,12 +96,17 @@ EMAIL_HOST_PASSWORD = 'Artlifu30'  # Your email password
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Django's default database
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'todo_app',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'; SET innodb_strict_mode=1;",
+            'collation': 'utf8mb4_general_ci'
+        },
     },
 }
 LOGIN_URL = '/login/'
