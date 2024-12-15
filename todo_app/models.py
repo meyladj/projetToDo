@@ -10,14 +10,12 @@ from django.conf import settings  # Pour AUTH_USER_MODEL
 def one_week_hence():
     return now() + timedelta(weeks=1)
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name
 
-#class UserProfile(models.Model):
-   # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-  #  about = models.TextField(blank=True, null=True)
-   # country = models.CharField(max_length=100, blank=True, null=True)
-   # address = models.TextField(blank=True, null=True)
-   # phone = models.CharField(max_length=15, blank=True, null=True)
 class TaskList(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -56,7 +54,7 @@ class Task(models.Model):
     )
     name = models.CharField(max_length=255)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
-    category = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES)
