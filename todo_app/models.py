@@ -21,7 +21,6 @@ class TaskList(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
- 
     def __str__(self):
         return self.name
 
@@ -55,11 +54,10 @@ class Task(models.Model):
     )
     name = models.CharField(max_length=255)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES)
-    due_date = models.DateTimeField()  # Add this if not already defined
 
     def __str__(self):
         return self.name

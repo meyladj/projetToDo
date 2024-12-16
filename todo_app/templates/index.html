@@ -31,7 +31,7 @@
   <link href="{% static 'vendor/remixicon/remixicon.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/simple-datatables/style.css' %}" rel="stylesheet">
 
-
+ 
 
 
 <link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -554,40 +554,47 @@
             <div class="card-body pb-0">
               <h5 class="card-title">categories <span>| Today</span></h5>
 
-              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
+              <div id="donutChart" style="min-height: 400px;" class="echart"></div>
               <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  const categoryData = JSON.parse('{{ category_data|safe }}');
-                
-                  echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: { trigger: 'item' },
-                    legend: { top: '5%', left: 'center' },
-                    series: [{
-                      name: 'Tasks by Category',
-                      type: 'pie',
-                      radius: ['40%', '70%'],
-                      avoidLabelOverlap: false,
-                      label: { show: false, position: 'center' },
-                      emphasis: {
+                console.log('Category Data JSON:', '{{ category_data_json|safe }}');
+            </script>
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+                  const categoryData = JSON.parse('{{ category_data_json|safe }}');
+              
+                  echarts.init(document.querySelector("#donutChart")).setOption({
+                      tooltip: { trigger: 'item' },
+                      legend: { top: '5%', left: 'center' },
+                      series: [{
+                          name: 'Task Categories',
+                          type: 'pie',
+                          radius: ['40%', '70%'],
+                          avoidLabelOverlap: false,
                         label: {
-                          show: true,
-                          fontSize: '18',
-                          fontWeight: 'bold'
-                        }
-                      },
-                      labelLine: { show: false },
-                      data: categoryData.map(category => ({
-                        value: category.count,
-                        name: category.name,
-                        itemStyle: { color: category.color }
-                      }))
-                    }]
+                          show: false,
+                          position: 'center'
+                           },
+                           emphasis: {
+          label: {
+            show: true,
+            fontSize: '18',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+                          data: categoryData.map(category => ({
+                              value: category.value,
+                              name: category.name,
+                              itemStyle: { color: category.color }
+                          })),
+                          
+                      }]
                   });
-                });
-                </script>
-                
-
+              });
+              </script>
+                            
             </div>
           </div><!-- End Website Traffic -->
 
@@ -615,6 +622,7 @@
   <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'vendor/chart.js/chart.umd.js' %}"></script>
+  <script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
   <script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
 
 

@@ -253,41 +253,49 @@
             <div class="card-body">
               <h5 class="card-title">Add Task</h5>
               <form method="POST" action="{% url 'add_task' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                  <label for="task-name" class="form-label">Task Name</label>
-                  <input type="text" class="form-control" id="task-name" name="name" placeholder="Enter task name" required>
-                </div>
-                <div class="mb-3">
-                  <label for="priority" class="form-label">Priority</label>
-                  <select class="form-select" id="priority" name="priority" required>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="category" class="form-label">Category</label>
-                  <input type="text" class="form-control" id="category" name="category" placeholder="Enter category" required>
-                </div>
-                <div class="mb-3">
-                  <label for="start-time" class="form-label">Start Time</label>
-                  <input type="datetime-local" class="form-control" id="start-time" name="start_time" required>
-                </div>
-                <div class="mb-3">
-                  <label for="end-time" class="form-label">End Time</label>
-                  <input type="datetime-local" class="form-control" id="end-time" name="end_time" required>
-                </div>
-                <div class="mb-3">
-                  <label for="status" class="form-label">Status</label>
-                  <select class="form-select" id="status" name="status" required>
-                    <option value="Finished">Finished</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Task</button>
-              </form>
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="task-name" class="form-label">Task Name</label>
+        <input type="text" class="form-control" id="task-name" name="name" placeholder="Enter task name" required>
+    </div>
+    <div class="mb-3">
+        <label for="priority" class="form-label">Priority</label>
+        <select class="form-select" id="priority" name="priority" required>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <select class="form-select" id="category" name="category" required>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+            
+        </select>
+        <button type="button" class="btn btn-success ms-3" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+          +
+      </button>
+    </div>
+    <div class="mb-3">
+        <label for="start-time" class="form-label">Start Time</label>
+        <input type="datetime-local" class="form-control" id="start-time" name="start_time" required>
+    </div>
+    <div class="mb-3">
+        <label for="end-time" class="form-label">End Time</label>
+        <input type="datetime-local" class="form-control" id="end-time" name="end_time" required>
+    </div>
+    <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <select class="form-select" id="status" name="status" required>
+            <option value="Finished">Finished</option>
+            <option value="Processing">Processing</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Task</button>
+</form>
             </div>
           </div>
         </div>
@@ -337,6 +345,58 @@
           </div>
         </div>
       </div>
+      <!-- Modal for Adding Category -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="addCategoryForm" method="POST" action="{% url 'add_category' %}">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                      <label for="category-name" class="form-label">Category Name</label>
+                      <input type="text" class="form-control" id="category-name" name="name" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="category-color" class="form-label">Category Color</label>
+                      <input type="color" class="form-control form-control-color" id="category-color" name="color" value="#ff0000" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Add Category</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+<script>
+  document.getElementById("addCategoryForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Empêche le rechargement de la page
+
+      const formData = new FormData(this);
+      const response = await fetch(this.action, {
+          method: "POST",
+          body: formData,
+      });
+
+      if (response.ok) {
+          const newCategory = await response.json(); // Retourne les données de la nouvelle catégorie
+          const select = document.getElementById("category");
+          const option = document.createElement("option");
+          option.value = newCategory.id;
+          option.textContent = newCategory.name;
+          select.appendChild(option);
+
+          // Fermer le modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
+          modal.hide();
+      } else {
+          alert("Failed to add category. Please try again.");
+      }
+  });
+</script>
+
     </section>
     
 

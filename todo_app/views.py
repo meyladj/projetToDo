@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+import json
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -7,6 +8,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Task, Category
+import json
 from .forms import TaskForm
 from .models import CustomUser
 from django.db import IntegrityError
@@ -19,64 +21,63 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 
 User = get_user_model()
-
-# Page de base
 def base_view(request):
-    return render(request, 'base.html')
-
-# Tableau de bord
+    return render(request, 'base.html') 
 @login_required
 def dashboard(request):
-    # Récupération du filtre pour le donut chart
-    filter_type = request.GET.get('filter', 'month')
     today = now().date()
 
-    # Déterminer la plage de dates selon le filtre
+    # --- LOGIC FOR TOP CARDS ---
+    start_of_week = today - timedelta(days=today.weekday())  # Start of the week
+    start_of_month = today.replace(day=1)  # Start of the month
+
+    # Count tasks for the cards
+    tasks_today = Task.objects.filter(end_time__date=today).count()
+    tasks_this_week = Task.objects.filter(end_time__date__gte=start_of_week).count()
+    tasks_this_month = Task.objects.filter(end_time__date__gte=start_of_month).count()
+
+    # --- LOGIC FOR THE DONUT CHART ---
+    # Get the filter for the donut chart
+    filter_type = request.GET.get('filter', 'month')
+
+    # Determine start date for the donut chart filter
     if filter_type == 'day':
         start_date = today
     elif filter_type == 'week':
-        start_date = today - timedelta(days=today.weekday())
-    else:  # Par défaut: mois
-        start_date = today.replace(day=1)
+        start_date = start_of_week
+    else:  # Default: month
+        start_date = start_of_month
 
-    # Tâches filtrées par date
-    tasks = Task.objects.filter(due_date__date__gte=start_date)
+    # Filter tasks by the selected date range for the donut chart
+    tasks_for_chart = Task.objects.filter(end_time__date__gte=start_date)
+    total_tasks_for_chart = tasks_for_chart.count()
 
-    # Comptage des tâches par catégorie
+    # Count tasks grouped by category
     categories = Category.objects.annotate(
-        task_count=Count('task', filter=Q(task__in=tasks))
+        task_count=Count('tasks', filter=Q(tasks__in=tasks_for_chart))
     )
-    total_tasks = tasks.count()
 
-    # Données pour le donut chart
+    # Prepare data for the donut chart
     category_data = [
         {
             "name": category.name,
-            "count": category.task_count,
-            "percentage": (category.task_count / total_tasks * 100) if total_tasks > 0 else 0,
-            "color": category.color or "#d3d3d3",  # Gris par défaut
+            "value": category.task_count,  # Changed from count to value for consistency
+            "color": category.color or "#d3d3d3",  # Default grey color
         }
         for category in categories
     ]
 
-    # Gestion des cas sans catégorie
-    if total_tasks == 0 or not category_data:
-        category_data = [{"name": "No Category", "count": 0, "percentage": 0, "color": "#d3d3d3"}]
+    # Fallback for no categories or no tasks
+    if total_tasks_for_chart == 0 or not category_data:
+        category_data = [{"name": "No Category", "value": 0, "color": "#d3d3d3"}]
 
-    # Calcul des tâches par jour, semaine, mois
-    start_of_week = today - timedelta(days=today.weekday())  # Début de la semaine
-    start_of_month = today.replace(day=1)  # Début du mois
-
-    tasks_today = Task.objects.filter(due_date__date=today).count()
-    tasks_this_week = Task.objects.filter(due_date__date__gte=start_of_week).count()
-    tasks_this_month = Task.objects.filter(due_date__date__gte=start_of_month).count()
-
+    # Pass data to the template
     return render(request, 'index.html', {
-        'category_data': category_data,
-        'filter_type': filter_type,
         'tasks_today': tasks_today,
         'tasks_this_week': tasks_this_week,
         'tasks_this_month': tasks_this_month,
+        'category_data_json': json.dumps(category_data),  # Pass JSON data for the donut chart
+        'filter_type': filter_type,
     })
 
 # Profil utilisateur
@@ -141,13 +142,27 @@ def task_add(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.user = request.user
+            task.user = request.user  # Associe la tâche à l'utilisateur connecté
             task.save()
+            messages.success(request, 'Task added successfully!')
             return redirect('task_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = TaskForm()
-    return render(request, 'add_task.html', {'form': form})
 
+    # Rendu du formulaire avec les erreurs ou formulaire vide
+    return render(request, 'tasks.html', {'form': form})
+
+@login_required
+def add_category(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        color = request.POST.get('color')
+        if name and color:
+            category = Category.objects.create(name=name, color=color)
+            return JsonResponse({'id': category.id, 'name': category.name, 'color': category.color})
+    return JsonResponse({'error': 'Invalid data'}, status=400)
 # Éditer une tâche
 @login_required
 def task_edit(request, id):
