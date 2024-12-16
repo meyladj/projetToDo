@@ -30,6 +30,10 @@ path('tasks/edit/<int:task_id>/', views.edit_task, name='edit_task'),
 path('notes/edit/<int:note_id>/', views.edit_note, name='edit_note'),
 path('notes/delete/<int:note_id>/', views.delete_note, name='delete_note'),
 path('tasks/delete/<int:task_id>/', views.delete_task, name='delete_task'),
+path('categories/add/', views.add_category, name='add_category'),
+path('categories/delete/<int:category_id>/', views.delete_category, name='delete_category'),
+
+
 
 
 ]

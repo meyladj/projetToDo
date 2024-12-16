@@ -362,3 +362,10 @@ def test_create_user(request):
         return HttpResponse("User created successfully!")
     except Exception as e:
         return HttpResponse(f"Error: {e}")
+
+def delete_category(request, category_id):
+    if request.method == 'POST':
+        category = get_object_or_404(Category, id=category_id)
+        category.delete()
+        return JsonResponse({'message': 'Category deleted successfully'}, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

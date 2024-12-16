@@ -185,6 +185,22 @@ h6 {
   height: 400px;
   max-height: 100%;
 }
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.delete-category {
+  color: gray;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.delete-category:hover {
+  color: red;
+}
 
 .card {
   height: 100%; /* Ensure the card expands properly */

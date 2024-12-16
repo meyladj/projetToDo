@@ -218,16 +218,27 @@
         </select>
     </div>
     <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
+      <label for="category" class="form-label">Category</label>
+      <div class="d-flex align-items-center">
         <select class="form-select" id="category" name="category" required>
-            {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-            
+          {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
         </select>
         <button type="button" class="btn btn-success ms-3" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
           +
-      </button>
+        </button>
+      </div>
+    
+      <!-- Liste des catégories avec croix -->
+      <ul id="categories-list" class="list-unstyled mt-3">
+        {% for category in categories %}
+        <li data-id="{{ category.id }}" class="category-item d-flex justify-content-between align-items-center">
+          <span>{{ category.name }}</span>
+          <span class="delete-category" onclick="deleteCategory('{{ category.id }}', this)" style="cursor: pointer; color: gray;">x</span>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
     <div class="mb-3">
         <label for="start-time" class="form-label">Start Time</label>
@@ -341,7 +352,74 @@
     </div>
   </div>
 </div>
+<script>
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
+document.getElementById("addCategoryForm").addEventListener("submit", async function (event) {
+  event.preventDefault(); // Empêche le rechargement de la page
+
+  const formData = new FormData(this);
+  const response = await fetch(this.action, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (response.ok) {
+    const newCategory = await response.json(); // Retourne les données de la nouvelle catégorie
+
+    // Ajouter au menu déroulant
+    const select = document.getElementById("category");
+    const option = document.createElement("option");
+    option.value = newCategory.id;
+    option.textContent = newCategory.name;
+    select.appendChild(option);
+
+    // Ajouter à la liste
+    const categoriesList = document.getElementById("categories-list");
+    const newCategoryItem = document.createElement("li");
+    newCategoryItem.setAttribute("data-id", newCategory.id);
+    newCategoryItem.classList.add("category-item", "d-flex", "justify-content-between", "align-items-center");
+    newCategoryItem.innerHTML = `
+      <span>${newCategory.name}</span>
+      <span class="delete-category" onclick="deleteCategory('${newCategory.id}', this)" style="cursor: pointer; color: gray;">x</span>
+    `;
+    categoriesList.appendChild(newCategoryItem);
+
+    // Fermer le modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
+    modal.hide();
+  } else {
+    alert("Failed to add category. Please try again.");
+  }
+});
+</script>
+<script>function deleteCategory(categoryId, element) {
+  fetch(`/categories/delete/${categoryId}/`, {
+      method: "POST",
+      headers: {
+          "X-CSRFToken": "{{ csrf_token }}"
+      }
+  })
+  .then(response => {
+      if (response.ok) {
+          // Supprimer la catégorie de la liste et du menu déroulant
+          const categoryItem = element.closest("li");
+          categoryItem.remove();
+
+          const select = document.getElementById("category");
+          const optionToRemove = select.querySelector(`option[value="${categoryId}"]`);
+          if (optionToRemove) {
+              optionToRemove.remove();
+          }
+      } else {
+          console.error("Erreur lors de la suppression de la catégorie.");
+      }
+  })
+  .catch(error => console.error("Erreur :", error));
+}
+console.log(`Suppression de la catégorie avec ID : ${categoryId}`);
+
+</script>
 <script>
   // Ouvrir le modal avec les données de la tâche
   function openEditModal(taskId) {
