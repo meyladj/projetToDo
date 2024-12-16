@@ -213,16 +213,19 @@ def add_category(request):
     return JsonResponse({'error': 'Invalid data'}, status=400)
 # Éditer une tâche
 @login_required
-def task_edit(request, id):
-    task = get_object_or_404(Task, id=id)
+def edit_task(request, task_id):
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect('task_list')
-    else:
-        form = TaskForm(instance=task)
-    return render(request, 'edit_task.html', {'form': form})
+        import json
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        data = json.loads(request.body)
+        task.name = data.get('name', task.name)
+        task.priority = data.get('priority', task.priority)
+        task.category.name = data.get('category', task.category.name)
+        task.start_time = data.get('start_time', task.start_time)
+        task.end_time = data.get('end_time', task.end_time)
+        task.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 # Inscription
 def register_view(request):
@@ -329,6 +332,16 @@ def delete_note(request, note_id):
         note.delete()
         return JsonResponse({"status": "success"})
     return
+@login_required
+def task_details(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    return JsonResponse({
+        'name': task.name,
+        'priority': task.priority,
+        'category': task.category.name,  # Utilise le champ de catégorie
+        'start_time': task.start_time.isoformat(),
+        'end_time': task.end_time.isoformat(),
+    })
 
 @login_required
 def delete_task(request, task_id):
