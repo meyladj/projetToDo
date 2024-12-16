@@ -247,29 +247,107 @@
       </nav>
     </div><!-- End Page Title -->
 
-    <section class="section">
-      <div class="row">
-        <div class="col-lg-6">
-        <div style="width: 100%; padding: 0; margin: 0;">
-  <div class="card-container">
-    <!-- Cartes -->
-    <div class="card">
-      <div class="card-header">Note 1</div>
-      <div class="card-body">
-        <p>Start creating your notes!</p>
-      </div>
-      <button class="add-note-btn">+</button>
-    </div>
-    <!-- Plus de cartes ici -->
-  </div>
-</div>
-        </div>
-        
+   <section class="section">
+  <div class="row">
+    <div class="col-lg-12">
+      <div style="width: 100%; padding: 0; margin: 0;">
+        <div class="card-container" id="cardContainer">
+          <!-- Notes dynamiques -->
+          {% for note in notes %}
+          <div class="card" data-id="{{ note.id }}">
+            <!-- Bouton Supprimer -->
+            <button class="edit-note-btn" onclick="deleteNote('{{ note.id }}', this)" 
+        style="background-color: #ff4d4d; color: white;">
+    x
+</button>
 
-        </div>
+            <!-- Titre et contenu modifiables -->
+            <input type="text" class="card-header" value="{{ note.title }}" 
+                   placeholder="Titre" onchange="updateNote('{{ note.id }}', this.value, null)">
+            <textarea class="card-body" placeholder="Écrivez ici..."
+                      onchange="updateNote('{{ note.id }}', null, this.value)">{{ note.content }}</textarea>
+          </div>
+          {% endfor %}
+          <!-- Carte pour ajouter une nouvelle note -->
+          <div class="card">
+            <button class="add-note-btn" onclick="addNewNote()">+</button>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+        
+    
+<!-- JavaScript -->
+<script>
+  // Fonction pour ajouter une nouvelle carte
+  function addNewNote() {
+    fetch("{% url 'add_note' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ title: "Nouvelle Note", content: "" })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const cardContainer = document.getElementById("cardContainer");
+      const newCard = `
+  <div class="card" data-id="${data.id}">
+    <button class="edit-note-btn" onclick="deleteNote('${data.id}', this)" 
+            style="background-color: #ff4d4d; color: white;">
+        x
+    </button>
+    <input type="text" class="card-header" value="${data.title}" 
+           placeholder="Titre" onchange="updateNote('${data.id}', this.value, null)">
+    <textarea class="card-body" placeholder="Écrivez ici..." 
+              onchange="updateNote('${data.id}', null, this.value)"></textarea>
+  </div>`;
+
+      cardContainer.insertAdjacentHTML("beforeend", newCard);
+    });
+  }
+  function deleteNote(id, button) {
+  fetch(`/notes/delete/${id}/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}"
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      const card = button.closest(".card");
+      card.remove(); // Supprimer la carte du DOM
+    } else {
+      console.error("Erreur lors de la suppression.");
+    }
+  });
+}
+  // Fonction pour mettre à jour une note
+  function updateNote(id, newTitle, newContent) {
+    const payload = {};
+    if (newTitle !== null) payload.title = newTitle;
+    if (newContent !== null) payload.content = newContent;
+
+    fetch(`/notes/edit/${id}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify(payload)
+    }).catch(error => console.error("Erreur :", error));
+  }
+
+  // Mettre le focus dans le champ de saisie
+  function focusOnNote(button) {
+    const card = button.closest(".card");
+    const input = card.querySelector(".card-header");
+    input.focus();
+  }
+</script>
 
   </main><!-- End #main -->
 

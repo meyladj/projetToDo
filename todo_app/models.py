@@ -10,6 +10,18 @@ from django.conf import settings  # Pour AUTH_USER_MODEL
 def one_week_hence():
     return now() + timedelta(weeks=1)
 
+class Note(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notes')
+    title = models.CharField(max_length=255)  # Titre obligatoire
+    content = models.TextField(blank=True)  # Contenu facultatif
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+    
+    
+
+
 class Category(models.Model):
     name = models.CharField(max_length=191, unique=True)
     color = models.CharField(max_length=7, default="#cccccc")  # Hex color code for categories

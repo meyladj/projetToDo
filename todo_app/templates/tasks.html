@@ -336,6 +336,8 @@
                     <td>
                       <!-- Edit Button -->
                       <a href="{% url 'task_edit' task.id %}" class="btn btn-warning btn-sm">Edit</a>
+                      <!-- Delete Button -->
+                     <button class="btn btn-danger btn-sm" onclick="deleteTask('{{ task.id }}', this)">Delete</button>
                     </td>
                   </tr>
                   {% endfor %}
@@ -345,6 +347,26 @@
           </div>
         </div>
       </div>
+      <script>
+        function deleteTask(taskId, button) {
+          fetch(`/tasks/delete/${taskId}/`, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}"
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              // Supprimer la ligne du tableau
+              const row = button.closest("tr");
+              row.remove();
+            } else {
+              console.error("Erreur lors de la suppression de la tâche.");
+            }
+          })
+          .catch(error => console.error("Erreur :", error));
+        }
+      </script>
       <!-- Modal for Adding Category -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
   <div class="modal-dialog">

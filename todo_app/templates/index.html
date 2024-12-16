@@ -357,8 +357,10 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const statusCounts = JSON.parse('{{ status_counts_json|safe }}');
+    // Parse graph data from the backend
+    const graphData = JSON.parse('{{ graph_data_json|safe }}');
 
+    // Configure the chart
     echarts.init(document.querySelector("#statusChart")).setOption({
       tooltip: { trigger: 'axis' },
       legend: {
@@ -366,34 +368,40 @@
       },
       xAxis: {
         type: 'category',
-        data: ['Tasks']
+        data: graphData.days, // Days of the week
       },
       yAxis: {
-        type: 'value'
+        type: 'value',
+        minInterval: 1, // Minimum step for the Y-axis
+        max: 10, // Extend to 10 if tasks increase
       },
       series: [
         {
           name: 'Completed',
-          type: 'line',
-          data: [statusCounts.completed],
-          color: '#2eca6a'  // Green color
+          type: 'bar',
+          stack: 'total',
+          data: graphData.finished,
+          itemStyle: { color: '#2eca6a' }, // Green
         },
         {
           name: 'In Progress',
-          type: 'line',
-          data: [statusCounts.in_progress],
-          color: '#4154f1'  // Blue color
+          type: 'bar',
+          stack: 'total',
+          data: graphData.processing,
+          itemStyle: { color: '#f4c542' }, // Yellow
         },
         {
           name: 'Canceled',
-          type: 'line',
-          data: [statusCounts.canceled],
-          color: '#ff771d'  // Orange color
-        }
+          type: 'bar',
+          stack: 'total',
+          data: graphData.cancelled,
+          itemStyle: { color: '#ff5959' }, // Red
+        },
       ]
     });
   });
 </script>
+
 
                   <!-- End Line Chart -->
 

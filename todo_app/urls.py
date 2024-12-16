@@ -23,6 +23,12 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('test-create-user/', views.test_create_user, name='test_create_user'),
     path('tasks/add-category/', views.add_category, name='add_category'),
+    path('notes/edit/<int:note_id>/', views.edit_note, name='edit_note'),
+    path('notes/add/', views.add_note, name='add_note'),
+path('notes/edit/<int:note_id>/', views.edit_note, name='edit_note'),
+path('notes/delete/<int:note_id>/', views.delete_note, name='delete_note'),
+path('tasks/delete/<int:task_id>/', views.delete_task, name='delete_task'),
+
 
 ]
 

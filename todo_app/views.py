@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Task, Category
+from .models import Note, Task, Category
 import json
 from .forms import TaskForm
 from .models import CustomUser
@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import now
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.db.models.functions import ExtractWeekDay
 
 User = get_user_model()
 def base_view(request):
@@ -79,6 +80,29 @@ def dashboard(request):
         category_data = [{"name": "No Category", "value": 0, "color": "#d3d3d3"}]
     print("Category Data:", category_data)
     print(json.dumps(category_data, indent=4))
+    # --- LOGIC FOR THE WEEKLY GRAPH ---
+    # Task counts grouped by weekday
+    weekly_data = Task.objects.filter(end_time__date__gte=start_of_week).annotate(
+        weekday=ExtractWeekDay('end_time')  # Returns 1 (Sunday) through 7 (Saturday)
+    ).values('weekday', 'status').annotate(
+        count=Count('id')
+    ).order_by('weekday')
+
+    # Prepare the data for the graph
+    weekday_mapping = {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
+    graph_data = {status: [0] * 7 for status in ['Finished', 'Processing', 'Cancelled']}
+
+    for entry in weekly_data:
+        day_index = (entry['weekday'] - 1) % 7  # Adjust Sunday to be last
+        graph_data[entry['status']][day_index] = entry['count']
+
+    # Convert to JSON for the template
+    graph_data_json = json.dumps({
+        'days': [weekday_mapping[i] for i in range(1, 8)],
+        'finished': graph_data['Finished'],
+        'processing': graph_data['Processing'],
+        'cancelled': graph_data['Cancelled'],
+    })
 
     # Pass data to the template
     return render(request, 'index.html', {
@@ -88,6 +112,7 @@ def dashboard(request):
         'category_data_json': json.dumps(category_data),  # Pass JSON data for the donut chart
         'filter_type': filter_type,
         'status_counts_json': json.dumps(status_counts),
+        'graph_data_json': graph_data_json,  # Pass JSON data for the graph
     })
 
 # Profil utilisateur
@@ -164,6 +189,19 @@ def task_add(request):
     # Rendu du formulaire avec les erreurs ou formulaire vide
     return render(request, 'tasks.html', {'form': form})
 
+@login_required
+def add_note(request):
+    if request.method == "POST":
+        import json
+        data = json.loads(request.body)
+        note = Note.objects.create(
+            user=request.user,
+            title=data.get("title", "Nouveau titre"),
+            content=data.get("content", "")
+        )
+        return JsonResponse({"id": note.id, "title": note.title, "content": note.content})
+    return JsonResponse({"error": "Invalid request"}, status=400)
+    
 @login_required
 def add_category(request):
     if request.method == 'POST':
@@ -264,6 +302,42 @@ def login_view(request):
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+@login_required
+def notes_view(request):
+    notes = Note.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'pages-blank.html', {'notes': notes})
+
+@login_required
+def edit_note(request, note_id):
+    if request.method == "POST":
+        import json
+        note = get_object_or_404(Note, id=note_id, user=request.user)
+        data = json.loads(request.body)
+        if "title" in data:
+            note.title = data["title"]
+        if "content" in data:
+            note.content = data["content"]
+        note.save()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def delete_note(request, note_id):
+    if request.method == "POST":
+        note = get_object_or_404(Note, id=note_id, user=request.user)
+        note.delete()
+        return JsonResponse({"status": "success"})
+    return
+
+@login_required
+def delete_task(request, task_id):
+    if request.method == "POST":
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        task.delete()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 
 def blank_page(request):

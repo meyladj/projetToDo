@@ -111,7 +111,7 @@ body, html {
 }
 
 .card .edit-note-btn:hover {
-  background-color: #fecf44; /* Teinte plus foncée au survol */
+  background-color: #e0a800; /* Teinte plus foncée au survol */
 }
 
 /* Bouton "+" */
