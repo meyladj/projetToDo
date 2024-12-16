@@ -36,6 +36,13 @@ def dashboard(request):
     tasks_this_week = Task.objects.filter(end_time__date__gte=start_of_week).count()
     tasks_this_month = Task.objects.filter(end_time__date__gte=start_of_month).count()
 
+    status_counts = {
+        'completed': Task.objects.filter(status='Finished').count(),
+        'in_progress': Task.objects.filter(status='Processing').count(),
+        'canceled': Task.objects.filter(status='Cancelled').count(),
+    }
+
+
     # --- LOGIC FOR THE DONUT CHART ---
     # Get the filter for the donut chart
     filter_type = request.GET.get('filter', 'month')
@@ -61,7 +68,7 @@ def dashboard(request):
     category_data = [
         {
             "name": category.name,
-            "value": category.task_count,  # Changed from count to value for consistency
+            "value": category.task_count or 0,  # Changed from count to value for consistency
             "color": category.color or "#d3d3d3",  # Default grey color
         }
         for category in categories
@@ -70,6 +77,8 @@ def dashboard(request):
     # Fallback for no categories or no tasks
     if total_tasks_for_chart == 0 or not category_data:
         category_data = [{"name": "No Category", "value": 0, "color": "#d3d3d3"}]
+    print("Category Data:", category_data)
+    print(json.dumps(category_data, indent=4))
 
     # Pass data to the template
     return render(request, 'index.html', {
@@ -78,6 +87,7 @@ def dashboard(request):
         'tasks_this_month': tasks_this_month,
         'category_data_json': json.dumps(category_data),  # Pass JSON data for the donut chart
         'filter_type': filter_type,
+        'status_counts_json': json.dumps(status_counts),
     })
 
 # Profil utilisateur
