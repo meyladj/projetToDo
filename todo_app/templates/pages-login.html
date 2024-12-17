@@ -11,8 +11,8 @@
 
   {% load static %}
   <!-- Favicons -->
-  <link href="{% static '/img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png' %}" rel="icon">
-  <link href="{% static '/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  <link href="{% static 'img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png' %}" rel="icon">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -22,11 +22,11 @@
 
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-  <link href="{% static 'vendor/boxicons/css/boxicons.min.css' %}"" rel="stylesheet">
-  <link href="{% static 'vendor/quill/quill.snow.css' %}"" rel="stylesheet">
-  <link href="{% static 'vendor/quill/quill.bubble.css' %}"" rel="stylesheet">
-  <link href="{% static 'vendor/remixicon/remixicon.css' %}"" rel="stylesheet">
-  <link href="{% static 'vendor/simple-datatables/style.css' %}"" rel="stylesheet">
+  <link href="{% static 'vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/quill/quill.snow.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/simple-datatables/style.css' %}" rel="stylesheet">
 
 
 
@@ -48,15 +48,22 @@
 
               <div class="d-flex justify-content-center py-4">
                 <a href="{% url 'base' %}" class="logo d-flex align-items-center w-auto">
-                  <img src="/img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png" alt="">
-                  <span class="d-none d-lg-block">Focus to do</span>
+                  <img src="{% static 'img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png' %}" alt="">
+                  <span>Focus to do</span>
                 </a>
               </div><!-- End Logo -->
 
               <div class="card mb-3">
 
                 <div class="card-body">
-
+                  {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
                   <div class="pt-4 pb-2">
                     <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
                     <p class="text-center small">Enter your username & password to login</p>
@@ -118,6 +125,9 @@
   <script src="{% static 'vendor/quill/quill.js' %}"></script>
   <script src="{% static 'vendor/simple-datatables/simple-datatables.js' %}"></script>
   <script src="{% static 'vendor/tinymce/tinymce.min.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 
   <!-- Template Main JS File -->

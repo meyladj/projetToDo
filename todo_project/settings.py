@@ -109,8 +109,23 @@ DATABASES = {
         },
     },
 }
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# Ajoutez ceci pour customiser les tags des messages pour Bootstrap
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'  # Redirige vers la page d'accueil après déconnexion
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

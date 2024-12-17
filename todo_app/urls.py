@@ -32,6 +32,7 @@ path('notes/delete/<int:note_id>/', views.delete_note, name='delete_note'),
 path('tasks/delete/<int:task_id>/', views.delete_task, name='delete_task'),
 path('categories/add/', views.add_category, name='add_category'),
 path('categories/delete/<int:category_id>/', views.delete_category, name='delete_category'),
+path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
 
 

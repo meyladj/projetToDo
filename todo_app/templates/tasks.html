@@ -175,7 +175,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{% url 'login' %}">
+        <a class="nav-link collapsed" href="{% url 'logout' %}">
           <i class="bi bi-box-arrow-in-right"></i>
           <span>Log out</span>
         </a>
@@ -185,20 +185,10 @@
 
   <main id="main" class="main">
 
-    <div class="pagetitle">
-      <h1>Blank Page</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
-          <li class="breadcrumb-item">Pages</li>
-          <li class="breadcrumb-item active">Blank</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section">
+    <br><br>
+    <section class="section d-flex align-items-center justify-content-center" style="height: 100vh;">
       <div class="row">
-        <div class="col-lg-6">
+        <div class="blank-page-container">
           <!-- Add Task Form -->
           <div class="card">
             <div class="card-body">
@@ -234,11 +224,12 @@
       <ul id="categories-list" class="list-unstyled mt-3">
         {% for category in categories %}
         <li data-id="{{ category.id }}" class="category-item d-flex justify-content-between align-items-center">
-          <span>{{ category.name }}</span>
-          <span class="delete-category" onclick="deleteCategory('{{ category.id }}', this)" style="cursor: pointer; color: gray;">x</span>
+            <span>{{ category.name }}</span>
+            <span class="delete-category" onclick="deleteCategory('{{ category.id }}', this)" style="cursor: pointer; color: gray;">x</span>
         </li>
         {% endfor %}
-      </ul>
+    </ul>
+    
     </div>
     <div class="mb-3">
         <label for="start-time" class="form-label">Start Time</label>
@@ -355,69 +346,55 @@
 <script>
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.getElementById("addCategoryForm").addEventListener("submit", async function (event) {
-  event.preventDefault(); // Empêche le rechargement de la page
+  document.getElementById("addCategoryForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const response = await fetch(this.action, { method: "POST", body: formData });
 
-  const formData = new FormData(this);
-  const response = await fetch(this.action, {
-    method: "POST",
-    body: formData,
-  });
+    if (response.ok) {
+        const newCategory = await response.json();
+        const select = document.getElementById("category");
+        const option = document.createElement("option");
+        option.value = newCategory.id;
+        option.textContent = newCategory.name;
+        select.appendChild(option);
 
-  if (response.ok) {
-    const newCategory = await response.json(); // Retourne les données de la nouvelle catégorie
+        const categoriesList = document.getElementById("categories-list");
+        const newCategoryItem = document.createElement("li");
+        newCategoryItem.setAttribute("data-id", newCategory.id);
+        newCategoryItem.classList.add("category-item", "d-flex", "justify-content-between", "align-items-center");
+        newCategoryItem.innerHTML = `
+            <span>${newCategory.name}</span>
+            <span class="delete-category" onclick="deleteCategory('${newCategory.id}', this)" style="cursor: pointer; color: gray;">x</span>
+        `;
+        categoriesList.appendChild(newCategoryItem);
 
-    // Ajouter au menu déroulant
-    const select = document.getElementById("category");
-    const option = document.createElement("option");
-    option.value = newCategory.id;
-    option.textContent = newCategory.name;
-    select.appendChild(option);
-
-    // Ajouter à la liste
-    const categoriesList = document.getElementById("categories-list");
-    const newCategoryItem = document.createElement("li");
-    newCategoryItem.setAttribute("data-id", newCategory.id);
-    newCategoryItem.classList.add("category-item", "d-flex", "justify-content-between", "align-items-center");
-    newCategoryItem.innerHTML = `
-      <span>${newCategory.name}</span>
-      <span class="delete-category" onclick="deleteCategory('${newCategory.id}', this)" style="cursor: pointer; color: gray;">x</span>
-    `;
-    categoriesList.appendChild(newCategoryItem);
-
-    // Fermer le modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
-    modal.hide();
-  } else {
-    alert("Failed to add category. Please try again.");
-  }
+        const modal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
+        modal.hide();
+    } else {
+        alert("Failed to add category.");
+    }
 });
+
 </script>
 <script>function deleteCategory(categoryId, element) {
   fetch(`/categories/delete/${categoryId}/`, {
       method: "POST",
-      headers: {
-          "X-CSRFToken": "{{ csrf_token }}"
-      }
+      headers: { "X-CSRFToken": "{{ csrf_token }}" }
   })
   .then(response => {
       if (response.ok) {
-          // Supprimer la catégorie de la liste et du menu déroulant
           const categoryItem = element.closest("li");
           categoryItem.remove();
 
           const select = document.getElementById("category");
           const optionToRemove = select.querySelector(`option[value="${categoryId}"]`);
-          if (optionToRemove) {
-              optionToRemove.remove();
-          }
+          if (optionToRemove) optionToRemove.remove();
       } else {
-          console.error("Erreur lors de la suppression de la catégorie.");
+          alert("Failed to delete category.");
       }
-  })
-  .catch(error => console.error("Erreur :", error));
+  });
 }
-console.log(`Suppression de la catégorie avec ID : ${categoryId}`);
 
 </script>
 <script>

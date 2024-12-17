@@ -10,13 +10,15 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
     <!-- Nucleo Icons -->
-    <link href="{% static 'css/creativetim/creativetim.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/creativetim.min.css' %}" rel="stylesheet" />
 <script src="{% static 'js/argon-design-system.min.js' %}"></script>
 <link href="{% static 'css/fonts/nucleo-icons.woff2' %}" rel="stylesheet" />
     <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
     <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
     <!-- Font Awesome Icons -->
     <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="{% static 'css/creativetim.min.css' %}">
     <link rel="icon" sizes="16x16" href="favicon.ico">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -24,6 +26,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<link href="{% static 'img/Logo_App_de_planning_Corporate_Rouge-removebg-preview.png' %}" rel="icon">
 
   </head>
   <body>
@@ -81,8 +84,7 @@
             <div class="row">
               <div class="col-lg-5 col-md-7 mr-auto text-left d-flex justify-content-center flex-column">
                 <h3 class="display-3">Focus To Do</h3>
-                <p class="lead mt-0">Bienvenue sur Focus To Do – votre compagnon de productivité tout-en-un. Organisez vos tâches, suivez vos échéances et atteignez de nouveaux niveaux de concentration au quotidien.</p>
-                <br>
+                <p class="lead mt-0">Welcome to Focus To Do - your all-in-one productivity companion. Organize tasks, track deadlines, and reach new levels of focus daily.</p>
                 <div class="buttons"><a class="btn btn-danger" href="javascript:;">Got it</a></div>
               </div>
             </div>
@@ -95,41 +97,31 @@
           <div class="row">
             <div class="col-md-8 mx-auto text-center">
               <h3 class="display-3">Your Productivity Dashboard</h3>
-              <p class="lead">Obtenez des informations sur vos progrès quotidiens. Suivez vos tâches, mesurez vos performances et ajustez vos priorités pour vous concentrer sur l'essentiel.</p>
+              <p class="lead">Get insights into your daily progress. Track tasks, measure performance, and adjust priorities to focus on what matters.</p>
             </div>
           </div>
           <div class="row">
             <div class="col-md-4">
               <div class="info">
-                <div class="icon icon-lg icon-shape icon-shape-primary shadow rounded-circle"><i class="ni ni-settings-gear-65"></i></div>
-                <h6 class="info-title text-uppercase text-primary">Analyse des progrès</h6>
-                <p class="description opacity-8">Décomposez vos objectifs et restez motivé grâce à des rapports visuels sur vos avancées.</p>
-                <a class="text-primary" href="javascript:;">
-                  <span class="mr-1">More about us</span>
-                  <i class="ni ni-bold-right text-primary"></i>
-                </a>
+                <div class="icon icon-lg icon-shape icon-shape-primary shadow rounded-circle"> <i class="bi bi-bar-chart"></i> </div>
+                <h6 class="info-title text-uppercase text-primary">Progress Analysis</h6>
+                <p class="description opacity-8">Break down your goals and stay motivated with visual reports on your progress.</p>
+                
               </div>
             </div>
             <div class="col-md-4">
               <div class="info">
-                <div class="icon icon-lg icon-shape icon-shape-success shadow rounded-circle"><i class="ni ni-atom"></i></div>
-                <h6 class="info-title text-uppercase text-success">Optimisation du flux de travail</h6>
-                <p class="description opacity-8">Adaptez vos routines pour une efficacité maximale et des transitions fluides.</p>
-                <a class="text-primary" href="javascript:;">
-                  <span class="mr-1">Learn about our products</span>
-                  <i class="ni ni-bold-right text-primary"></i>
-                </a>
+                <div class="icon icon-lg icon-shape icon-shape-success shadow rounded-circle"> <i class="bi bi-gear-fill"></i></i></div>
+                <h6 class="info-title text-uppercase text-success">Workflow Optimization</h6>
+                <p class="description opacity-8">Adapt your routines for maximum efficiency and smooth transitions.</p>
               </div>
             </div>
             <div class="col-md-4">
               <div class="info">
-                <div class="icon icon-lg icon-shape icon-shape-warning shadow rounded-circle"><i class="ni ni-world"></i></div>
+                <div class="icon icon-lg icon-shape icon-shape-warning shadow rounded-circle"> <i class="bi bi-graph-up-arrow"></i> </i></div>
                 <h6 class="info-title text-uppercase text-warning">Measure Conversions</h6>
-                <p class="description opacity-8">What else could rust the heart more over time? Blackgold. The time is now for it to be okay to be great. or being a bright color. For standing out.</p>
-                <a class="text-primary" href="javascript:;">
-                  <span class="mr-1">Check our documentation</span>
-                  <i class="ni ni-bold-right text-primary"></i>
-                </a>
+                <p class="description opacity-8">Track performance and adjust priorities based on data.</p>
+                
               </div>
             </div>
           </div>
@@ -141,9 +133,8 @@
           <div class="row align-items-center">
             <div class="col-lg-4 col-md-8 mr-auto text-left">
               <div class="pr-md-5">
-                <div class="icon icon-lg icon-shape icon-shape-primary shadow rounded-circle mb-5"><i class="ni ni-favourite-28"></i></div>
-                <h3>Fonctionnalités Impressionnantes</h3>
-                <p>Découvrez des outils conçus pour simplifier la gestion de vos tâches et vous aider à atteindre vos objectifs plus rapidement. Personnalisez votre liste de tâches, restez organisé et améliorez votre productivité en toute simplicité.</p>
+                <h3>Impressive Features</h3>
+                <p>Discover tools designed to simplify task management and help you achieve your goals faster.</p>
                 <ul class="list-unstyled mt-5">
                   <li class="py-2">
                     <div class="d-flex align-items-center">  
@@ -167,48 +158,64 @@
               <div class="row">
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-info shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-satisfied text-info"></i></div>
-                    <h5 class="info-title text-white">Une Gestion de Qualité</h5>
-                    <p class="description">Ce qui compte, c'est de vous permettre de rester concentré et organisé. Simplifiez votre quotidien avec une liste de tâches claire et efficace.</p>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-check-circle text-info"></i> <!-- Gestion de qualité -->
+                    </div>
+                    <h5 class="info-title text-white">Quality Management</h5>
+                    <p class="description">Stay focused and organized with quality tools.</p>
                   </div>
                 </div>
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-danger info-raised shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-palette text-danger"></i></div>
-                    <h5 class="info-title text-white">Un Design Inspirant</h5>
-                    <p class="description">Parce qu'il s'agit de motiver ceux qui agissent. Avec Focus To Do, suivez vos ambitions et accomplissez vos objectifs tout en restant inspiré.</p>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-paint-brush text-danger"></i> <!-- Design Inspirant -->
+                    </div>
+                    <h5 class="info-title text-white">Inspiring Design</h5>
+                    <p class="description">Follow your ambitions with a motivating design.</p>
                   </div>
                 </div>
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-default shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-spaceship text-default"></i></div>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-rocket text-default"></i> <!-- Great Performance -->
+                    </div>
                     <h5 class="info-title text-white">Great Performance</h5>
-                    <p class="description">There’s nothing I really wanted to do in life that I wasn’t able to get good at. We’re constantly growing.</p>
+                    <p class="description">We’re constantly growing and improving.</p>
                   </div>
                 </div>
-              </div>
-              <div class="row">
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-primary shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-planet text-primary"></i></div>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-bolt text-primary"></i> <!-- Fast Development -->
+                    </div>
                     <h5 class="info-title text-white">Fast Development</h5>
-                    <p class="description">I always felt like I could do anything. That’s the main thing people are controlled by the force!</p>
+                    <p class="description">Optimize your time and resources for better results.</p>
                   </div>
                 </div>
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-warning info-raised shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-glasses-2 text-warning"></i></div>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-leaf text-warning"></i> <!-- Super Fresh -->
+                    </div>
                     <h5 class="info-title text-white">Super Fresh</h5>
-                    <p class="description">Thoughts- their perception of themselves! They're slowed down by their perception of themselves.</p>
+                    <p class="description">Stay fresh and innovative with new ideas and tools.</p>
                   </div>
                 </div>
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="info text-left bg-success shadow">
-                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary"><i class="ni ni-notification-70 text-success"></i></div>
+                    <div class="icon icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                      <i class="fas fa-folder-open text-success"></i> <!-- Organized Content -->
+                    </div>
                     <h5 class="info-title text-white">Organized Content</h5>
-                    <p class="description">If you're taught you can’t do anything, you won’t do anything. I was taught I could do everything.</p>
+                    <p class="description">Structure and organize your content effectively.</p>
                   </div>
                 </div>
+                
               </div>
             </div>
           </div>
@@ -309,4 +316,3 @@
     </script>
   </body>
 </html>
-

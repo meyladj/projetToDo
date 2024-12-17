@@ -52,6 +52,31 @@ h6 {
     padding: 20px;
   }
 }
+@media (min-width: 992px) {
+  .center-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Utiliser toute la hauteur de l'écran */
+  }
+
+  .center-card .card {
+    width: 50%; /* Ajustez selon vos besoins */
+    max-width: 500px; /* Limite maximale de largeur */
+  }
+}
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Prend toute la hauteur de l'écran */
+}
+
+.card {
+  width: 100%;
+  max-width: 600px; /* Limite la largeur de la carte */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
 /*--------------------------------------------------------------
 # Page Title

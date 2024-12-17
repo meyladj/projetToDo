@@ -167,8 +167,9 @@ def contact(request):
 # Liste des tâches
 @login_required
 def task_list(request):
+    categories = Category.objects.all()
     tasks = Task.objects.filter(user=request.user)
-    return render(request, 'tasks.html', {'tasks': tasks})
+    return render(request, 'tasks.html', {'tasks': tasks, 'categories': categories})
 
 # Ajouter une tâche
 @login_required
@@ -208,7 +209,7 @@ def add_category(request):
         name = request.POST.get('name')
         color = request.POST.get('color')
         if name and color:
-            category = Category.objects.create(name=name, color=color)
+            category, created = Category.objects.get_or_create(name=name, defaults={'color': color})
             return JsonResponse({'id': category.id, 'name': category.name, 'color': category.color})
     return JsonResponse({'error': 'Invalid data'}, status=400)
 # Éditer une tâche
@@ -363,9 +364,10 @@ def test_create_user(request):
     except Exception as e:
         return HttpResponse(f"Error: {e}")
 
+@login_required
 def delete_category(request, category_id):
     if request.method == 'POST':
         category = get_object_or_404(Category, id=category_id)
         category.delete()
-        return JsonResponse({'message': 'Category deleted successfully'}, status=200)
+        return JsonResponse({'message': 'Category deleted successfully'})
     return JsonResponse({'error': 'Invalid request'}, status=400)
