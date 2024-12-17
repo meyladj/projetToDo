@@ -3,6 +3,11 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings  # Pour AUTH_USER_MODEL
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.views import View
+from django.contrib.auth import logout
 
 
 
@@ -20,7 +25,17 @@ class Note(models.Model):
         return self.title
     
     
+class Notification(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # Use the dynamic user model
+        on_delete=models.CASCADE
+    )
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+    
 
+    def __str__(self):
+        return f"Notification for {self.user}: {self.message}"
 
 class Category(models.Model):
     name = models.CharField(max_length=191, unique=True)
@@ -70,7 +85,6 @@ class Task(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES)
-
     def __str__(self):
         return self.name
     

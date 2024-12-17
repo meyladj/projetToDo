@@ -70,67 +70,44 @@
         </li><!-- End Search Icon-->
 
         <li class="nav-item dropdown">
-
           <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number">0</span>
+            {% if notifications %}
+              <span class="badge bg-primary badge-number">{{ notifications.count }}</span>
+            {% endif %}
           </a><!-- End Notification Icon -->
-
+        
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">
-              You have 4 new notifications
+              You have {{ notifications.count }} new notifications
               <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
-
-            <li class="notification-item">
-              <i class="bi bi-exclamation-circle text-warning"></i>
-              <div>
-                <h4>you have 1 waiting task</h4>
-                <p>this task is waiting for you</p>
-                <p>30 min. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-x-circle text-danger"></i>
-              <div>
-                <h4>you cancelled a Tasks</h4>
-                <p>this task is not waiting for you</p>
-                <p>1 hr. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-check-circle text-success"></i>
-              <div>
-                <h4>you just completed a Tasks</h4>
-                <p>go kween go</p>
-                <p>2 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
+        
+            {% for notification in notifications %}
+              <li class="notification-item">
+                <i class="bi bi-info-circle text-primary"></i>
+                <div>
+                  <p>{{ notification.message }}</p>
+                  <p><small>{{ notification.created_at|date:"M d, H:i" }}</small></p>
+                </div>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+            {% empty %}
+              <li class="notification-item">
+                <p>No new notifications.</p>
+              </li>
+            {% endfor %}
+        
             <li class="dropdown-footer">
               <a href="#">Show all notifications</a>
             </li>
-
-          </ul><!-- End Notification Dropdown Items -->
+          </ul>
+        </li><!-- End Notification Nav -->
 
         </li><!-- End Notification Nav -->
 
@@ -360,50 +337,45 @@
             <!-- Recent Sales -->
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Recent Tasks </h5>
-
+                  <h5 class="card-title">Recent Tasks</h5>
                   <table class="table table-borderless datatable">
                     <thead>
-                        <th scope="col">Tasks</th>
-                        <th scope="col">category</th>
-                        <th scope="col">due date</th>
+                      <tr>
+                        <th scope="col">Task</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Due Date</th>
                         <th scope="col">Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        
-                        <tbody>
-                          {% for task in tasks %}
-                          <tr>
-                            <td>{{ task.name }}</td>
-                            <td><a href="#" class="text-primary">{{ task.category.name }}</a></td>
-                            <td>{{ task.due_date }}</td>
-                            <td>
-                              {% if task.is_completed %}
-                              <span class="badge bg-success">Done</span>
-                              {% else %}
-                              <span class="badge bg-warning">Pending</span>
-                              {% endif %}
-                            </td>
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                      </tr>
+                      {% for task in recent_tasks %}
+                        <tr>
+                          <td>{{ task.name }}</td>
+                          <td>{{ task.category.name }}</td>
+                          <td>{{ task.due_date }}</td>
+                          <td>
+                            {% if task.status == 'Finished' %}
+                              <span class="badge bg-success">Finished</span>
+                            {% elif task.status == 'Processing' %}
+                              <span class="badge bg-warning">Processing</span>
+                            {% elif task.status == 'Cancelled' %}
+                              <span class="badge bg-danger">Cancelled</span>
+                            {% else %}
+                              <span class="badge bg-secondary">Unknown</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% empty %}
+                        <tr>
+                          <td colspan="4" class="text-center">No tasks available</td>
+                        </tr>
+                      {% endfor %}
                     </tbody>
                   </table>
-
                 </div>
-
               </div>
-            </div><!-- End Recent Sales -->
+            </div>
 
           </div>
         </div><!-- End Left side columns -->
@@ -411,71 +383,9 @@
         <!-- Right side columns -->
         <div class="col-lg-4">
 
-          <!-- Recent Activity -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-              
-            </div>
+         
 
-            <div class="card-body">
-              <h5 class="card-title">Recent Activity <span>| Today</span></h5>
 
-              <div class="activity">
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">32 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                  <div class="activity-content">
-                    no Tasks <a href="#" class="fw-bold text-dark">yet</a> .
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">0min</div>
-                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                  <div class="activity-content">
-                    no Tasks
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">0 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                  <div class="activity-content">
-                    no Tasks
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">0 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                  <div class="activity-content">
-                    no Tasks <a href="#" class="fw-bold text-dark">yet</a>.
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">0 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content">
-                    No Tasks
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">0 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                  <div class="activity-content">
-                    no Tasks
-                  </div>
-                </div><!-- End activity item-->
-
-              </div>
-
-            </div>
-          </div><!-- End Recent Activity -->
 
           
 
@@ -593,7 +503,8 @@
   <script src="{% static 'vendor/simple-datatables/simple-datatables.js' %}"></script>
   <script src="{% static 'vendor/tinymce/tinymce.min.js' %}"></script>
 
-
+ 
+  
   <!-- Template Main JS File -->
   <script src="{% static 'js/main.js' %}"></script>
 

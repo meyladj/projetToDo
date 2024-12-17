@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Note, Task, Category
+from .models import Note, Notification, Task, Category
 import json
 from .forms import TaskForm
 from .models import CustomUser
@@ -20,12 +20,18 @@ from django.utils.timezone import now
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.db.models.functions import ExtractWeekDay
+from django.contrib.auth import logout
+from django.views import View
+
 
 User = get_user_model()
 def base_view(request):
     return render(request, 'base.html') 
 @login_required
 def dashboard(request):
+    # Récupérer les 5 dernières tâches
+    recent_tasks = Task.objects.all().order_by('-id')[:5]
+
     today = now().date()
 
     # --- LOGIC FOR TOP CARDS ---
@@ -106,6 +112,7 @@ def dashboard(request):
 
     # Pass data to the template
     return render(request, 'index.html', {
+        'recent_tasks': recent_tasks, 
         'tasks_today': tasks_today,
         'tasks_this_week': tasks_this_week,
         'tasks_this_month': tasks_this_month,
@@ -175,6 +182,29 @@ def task_list(request):
 @login_required
 def task_add(request):
     if request.method == 'POST':
+        if request.method == "POST":
+         task_name = request.POST.get('name')
+         category = request.POST.get('category')
+         due_date = request.POST.get('due_date')
+
+        # Example task creation logic
+        Task.objects.create(
+            user=request.user,
+            name=task_name,
+            category_id=category,
+            due_date=due_date,
+            status="Pending"
+        )
+
+        # Create a notification for the user
+        Notification.objects.create(
+            user=request.user,
+            message=f"New task '{task_name}' has been added!"
+        )
+
+        messages.success(request, "Task added successfully!")
+        return redirect('dashboard')
+
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
@@ -371,3 +401,8 @@ def delete_category(request, category_id):
         category.delete()
         return JsonResponse({'message': 'Category deleted successfully'})
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+class CustomLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('base')  # Redirige vers la page de base (ou autre URL souhaitée)

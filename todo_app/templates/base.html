@@ -227,7 +227,8 @@
             <div class="col-md-8">
               <h3 class="text-center">Contact Us</h3>
               <p class="text-center">We’d love to hear from you! Fill out the form below to get in touch.</p>
-              <form action="/contact" method="post" class="contact-form">
+              <form action="{% url 'contact' %}" method="post" class="contact-form">
+                {% csrf_token %}
                 <div class="form-group">
                   <label for="name">Your Name</label>
                   <input type="text" id="name" name="name" class="form-control" required>
@@ -244,6 +245,22 @@
                   <button type="submit" class="btn btn-primary">Send Message</button>
                 </div>
               </form>
+                 
+               <!-- Messages de confirmation ou d'erreur -->
+        <div class="col-md-12 mt-3">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
             </div>
           </div>
         </div>

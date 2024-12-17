@@ -84,12 +84,13 @@ AUTH_USER_MODEL = 'todo_app.CustomUser'
 WSGI_APPLICATION = 'todo_project.wsgi.application'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Use your email host
+EMAIL_USE_TLS = True  # Utilisez TLS pour le port 587
+EMAIL_HOST = 'smtp.office365.com'  # Use your email host
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'meyladjabeee@gmail.com'  # Your email address
+EMAIL_HOST_USER = 'elizabeth.muller@igconseil.ch'  # Your email address
 EMAIL_HOST_PASSWORD = 'Artlifu30'  # Your email password
-
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -124,7 +125,7 @@ MESSAGE_TAGS = {
 }
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/'  # Redirige vers la page d'accueil après déconnexion
+LOGOUT_REDIRECT_URL = 'base'  # Redirige vers la page d'accueil après déconnexion
 
 LOGGING = {
     'version': 1,
