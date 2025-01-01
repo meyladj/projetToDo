@@ -35,6 +35,7 @@ path('tasks/delete/<int:task_id>/', views.delete_task, name='delete_task'),
 path('categories/add/', views.add_category, name='add_category'),
 path('categories/delete/<int:category_id>/', views.delete_category, name='delete_category'),
  path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('notifications/', views.get_notifications, name='get_notifications'),
 ]
 
 

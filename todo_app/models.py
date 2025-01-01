@@ -26,16 +26,20 @@ class Note(models.Model):
     
     
 class Notification(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # Use the dynamic user model
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
-    
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"Notification for {self.user}: {self.message}"
+
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
 
 class Category(models.Model):
     name = models.CharField(max_length=191, unique=True)

@@ -558,7 +558,134 @@
       }
   });
 </script>
-
+<script>
+  function refreshNotifications() {
+      fetch('/notifications/')
+          .then(response => response.json())
+          .then(data => {
+              const notificationsList = document.querySelector('.notifications');
+              const badge = document.querySelector('.badge.bg-primary.badge-number');
+              
+              if (data.notifications.length > 0) {
+                  // Update badge count
+                  if (badge) {
+                      badge.textContent = data.notifications.length;
+                  }
+                  
+                  // Update notification list
+                  const notificationsHTML = data.notifications.map(notif => `
+                      <li class="notification-item">
+                          <i class="bi bi-info-circle text-primary"></i>
+                          <div>
+                              <p>${notif.message}</p>
+                              <p><small>${notif.created_at}</small></p>
+                          </div>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                  `).join('');
+                  
+                  notificationsList.innerHTML = `
+                      <li class="dropdown-header">
+                          You have ${data.notifications.length} new notifications
+                          <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      ${notificationsHTML}
+                      <li class="dropdown-footer">
+                          <a href="#" onclick="markAllAsRead(); return false;">Mark all as read</a>
+                      </li>
+                  `;
+              } else {
+                  // Remove badge if no notifications
+                  if (badge) {
+                      badge.remove();
+                  }
+                  
+                  // Show empty state
+                  notificationsList.innerHTML = `
+                      <li class="dropdown-header">No new notifications</li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li class="notification-item">
+                          <p>No new notifications.</p>
+                      </li>
+                      <li class="dropdown-footer">
+                          <a href="#">Show all notifications</a>
+                      </li>
+                  `;
+              }
+          });
+  }
+  
+  // Refresh notifications every 30 seconds
+  setInterval(refreshNotifications, 30000);
+  
+  // Initial load of notifications
+  document.addEventListener('DOMContentLoaded', refreshNotifications);
+  </script>
+  <script>
+    function refreshNotifications() {
+        fetch('/notifications/')
+            .then(response => response.json())
+            .then(data => {
+                const notificationsList = document.querySelector('.notifications');
+                const badge = document.querySelector('.badge.bg-primary.badge-number');
+                
+                if (data.notifications.length > 0) {
+                    // Update badge count
+                    if (badge) {
+                        badge.textContent = data.notifications.length;
+                    }
+                    
+                    // Update notification list
+                    const notificationsHTML = data.notifications.map(notif => `
+                        <li class="notification-item">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            <div>
+                                <p>${notif.message}</p>
+                                <p><small>${notif.created_at}</small></p>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                    `).join('');
+                    
+                    notificationsList.innerHTML = `
+                        <li class="dropdown-header">
+                            You have ${data.notifications.length} new notifications
+                            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        ${notificationsHTML}
+                        <li class="dropdown-footer">
+                            <a href="#" onclick="markAllAsRead(); return false;">Mark all as read</a>
+                        </li>
+                    `;
+                } else {
+                    // Remove badge if no notifications
+                    if (badge) {
+                        badge.remove();
+                    }
+                    
+                    // Show empty state
+                    notificationsList.innerHTML = `
+                        <li class="dropdown-header">No new notifications</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="notification-item">
+                            <p>No new notifications.</p>
+                        </li>
+                        <li class="dropdown-footer">
+                            <a href="#">Show all notifications</a>
+                        </li>
+                    `;
+                }
+            });
+    }
+    
+    // Refresh notifications every 30 seconds
+    setInterval(refreshNotifications, 30000);
+    
+    // Initial load of notifications
+    document.addEventListener('DOMContentLoaded', refreshNotifications);
+    </script>
     </section>
     
 

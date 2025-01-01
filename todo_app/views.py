@@ -27,6 +27,8 @@ from django.views import View
 User = get_user_model()
 def base_view(request):
     return render(request, 'base.html') 
+
+
 @login_required
 def dashboard(request):
     # Récupérer les 5 dernières tâches
@@ -45,8 +47,8 @@ def dashboard(request):
 
     status_counts = {
         'completed': Task.objects.filter(status='Finished').count(),
-        'in_progress': Task.objects.filter(status='Processing').count(),
         'canceled': Task.objects.filter(status='Cancelled').count(),
+        'processing': Task.objects.filter(status='Processing').count()  # Changed from 'pending'
     }
 
 
@@ -96,19 +98,31 @@ def dashboard(request):
 
     # Prepare the data for the graph
     weekday_mapping = {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
-    graph_data = {status: [0] * 7 for status in ['Finished', 'Processing', 'Cancelled']}
+    graph_data = {}
+    for status, _ in Task.STATUS_CHOICES:  # Use the choices from the model
+        graph_data[status] = [0] * 7
 
+    # Process weekly data
     for entry in weekly_data:
-        day_index = (entry['weekday'] - 1) % 7  # Adjust Sunday to be last
-        graph_data[entry['status']][day_index] = entry['count']
+        day_index = (entry['weekday'] - 1) % 7
+        status = entry['status']
+        if status in graph_data:
+            graph_data[status][day_index] = entry['count']
 
     # Convert to JSON for the template
     graph_data_json = json.dumps({
         'days': [weekday_mapping[i] for i in range(1, 8)],
         'finished': graph_data['Finished'],
         'processing': graph_data['Processing'],
-        'cancelled': graph_data['Cancelled'],
+        'cancelled': graph_data['Cancelled']
     })
+
+    # Update status counts
+    status_counts = {
+        'finished': Task.objects.filter(status='Finished').count(),
+        'processing': Task.objects.filter(status='Processing').count(),
+        'cancelled': Task.objects.filter(status='Cancelled').count()
+    }
 
     # Pass data to the template
     return render(request, 'index.html', {
@@ -182,43 +196,43 @@ def task_list(request):
 @login_required
 def task_add(request):
     if request.method == 'POST':
-        if request.method == "POST":
-         task_name = request.POST.get('name')
-         category = request.POST.get('category')
-         due_date = request.POST.get('due_date')
+        task_name = request.POST.get('name')
+        category = request.POST.get('category')
+        end_time = request.POST.get('end_time')
+        start_time = request.POST.get('start_time')
+        priority = request.POST.get('priority')
+        status = request.POST.get('status', 'Processing')  # Default to Processing if not provided
 
-        # Example task creation logic
-        Task.objects.create(
-            user=request.user,
-            name=task_name,
-            category_id=category,
-            due_date=due_date,
-            status="Pending"
-        )
+        try:
+            # Create the task
+            task = Task.objects.create(
+                user=request.user,
+                name=task_name,
+                category_id=category,
+                start_time=start_time,
+                end_time=end_time,
+                status=status,
+                priority=priority
+            )
 
-        # Create a notification for the user
-        Notification.objects.create(
-            user=request.user,
-            message=f"New task '{task_name}' has been added!"
-        )
+            # Create notification for task creation
+            Notification.objects.create(
+                user=request.user,
+                message=f"Task '{task_name}' has been created successfully!"
+            )
 
-        messages.success(request, "Task added successfully!")
-        return redirect('dashboard')
-
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.user = request.user  # Associe la tâche à l'utilisateur connecté
-            task.save()
-            messages.success(request, 'Task added successfully!')
+            messages.success(request, "Task added successfully!")
             return redirect('task_list')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = TaskForm()
+        except Exception as e:
+            messages.error(request, f"Error creating task: {str(e)}")
+            return redirect('task_list')
 
-    # Rendu du formulaire avec les erreurs ou formulaire vide
-    return render(request, 'tasks.html', {'form': form})
+    categories = Category.objects.all()
+    tasks = Task.objects.filter(user=request.user)
+    return render(request, 'tasks.html', {
+        'categories': categories,
+        'tasks': tasks
+    })
 
 @login_required
 def add_note(request):
@@ -378,7 +392,15 @@ def task_details(request, task_id):
 def delete_task(request, task_id):
     if request.method == "POST":
         task = get_object_or_404(Task, id=task_id, user=request.user)
+        task_name = task.name  # Store the name before deletion
         task.delete()
+        
+        # Create notification for task deletion
+        Notification.objects.create(
+            user=request.user,
+            message=f"Task '{task_name}' has been deleted successfully!"
+        )
+        
         return JsonResponse({"status": "success"})
     return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -406,3 +428,25 @@ class CustomLogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('base')  # Redirige vers la page de base (ou autre URL souhaitée)
+
+# Add this new view to fetch notifications
+@login_required
+def get_notifications(request):
+    notifications = Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).order_by('-created_at')[:5]
+    
+    data = [{
+        'message': notif.message,
+        'created_at': notif.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for notif in notifications]
+    
+    return JsonResponse({'notifications': data})
+
+@login_required
+def mark_all_notifications_read(request):
+    if request.method == 'POST':
+        Notification.objects.filter(user=request.user).update(is_read=True)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=405)
